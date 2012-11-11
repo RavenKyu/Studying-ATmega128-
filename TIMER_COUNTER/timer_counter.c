@@ -7,11 +7,9 @@
 
 volatile unsigned int tic_time;
 
-SIGNAL(SIG_OVERFLOW0)
+SIGNAL(SIG_OUTPUT_COMPARE0)
 {
     tic_time++;
-
-    TCNT0 = 256 - (CPU_CLOCK / TICKS_PER_SEC / 64);
 }
 
 void delay_ms(unsigned int msec)
@@ -28,10 +26,10 @@ int main(void)
     DDRC = 0xff;                /* LED 초기화 */
     PORTC = 0xff;
 
-    TCCR0 = (1 << CS02) | (0 << CS01) | (0 << CS00);
-    TCNT0 = 256 - (CPU_CLOCK / TICKS_PER_SEC / 64);
+    TCCR0 = (1 << CS02) | (0 << CS01) | (0 << CS00) | (0 << WGM00) | (1 << WGM01); /* 비교 인터럽트 */
+    OCR0 = 250;                 /* OCR을 초기화 6을 따로 줄 필요가 없다. */
 
-    TIMSK = (0 << OCIE0) | (1 << TOIE0);
+    TIMSK = (1 << OCIE0) | (0 << TOIE0);
 
     sei();
 
